@@ -41,3 +41,6 @@ tmp/
 .project
 .pydevproject
 .settings/*
+
+# emacs
+*~
