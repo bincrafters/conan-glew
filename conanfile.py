@@ -22,10 +22,11 @@ class GlewConan(ConanFile):
         if os_info.is_linux:
             if os_info.with_apt:
                 installer = SystemPackageTool()
-                installer.install("libgl-dev")
                 if self.settings.arch == "x86" and tools.detected_architecture() == "x86_64":
+                    installer.install("libgl1-mesa-dev:i386")
                     installer.install("libglu1-mesa-dev:i386")
                 else:
+                    installer.install("libgl1-mesa-dev")
                     installer.install("libglu1-mesa-dev")
             elif os_info.with_yum:
                 installer = SystemPackageTool()
