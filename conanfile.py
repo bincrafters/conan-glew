@@ -23,18 +23,16 @@ class GlewConan(ConanFile):
             if os_info.with_apt:
                 installer = SystemPackageTool()
                 if self.settings.arch == "x86" and tools.detected_architecture() == "x86_64":
+                    installer.install("g++-multilib")
                     installer.install("libgl1-mesa-dev:i386")
-                    installer.install("libglu1-mesa-dev:i386")
                 else:
                     installer.install("libgl1-mesa-dev")
-                    installer.install("libglu1-mesa-dev")
             elif os_info.with_yum:
                 installer = SystemPackageTool()
-                installer.install("libGL-devel")
                 if self.settings.arch == "x86" and tools.detected_architecture() == "x86_64":
-                    installer.install("mesa-libGLU-devel.i686")
+                    installer.install("libGL-devel.i686")
                 else:
-                    installer.install("mesa-libGLU-devel")
+                    installer.install("libGL-devel")
             else:
                 self.output.warn("Could not determine Linux package manager, skipping system requirements installation.")
 
