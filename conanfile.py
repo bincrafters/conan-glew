@@ -1,8 +1,8 @@
 import os
 from conans import ConanFile, CMake
-from conans.tools import os_info, SystemPackageTool, ConanException, replace_in_file
+from conans.tools import os_info, SystemPackageTool, replace_in_file
 from conans import tools, VisualStudioBuildEnvironment
-from conans.tools import build_sln_command, vcvars_command, download, unzip
+from conans.tools import build_sln_command, vcvars_command, unzip
 
 class GlewConan(ConanFile):
     name = "glew"
@@ -49,10 +49,13 @@ class GlewConan(ConanFile):
         del self.settings.compiler.libcxx
 
     def source(self):
-        zip_name = "%s.tgz" % self.source_subfolder
-        download("https://sourceforge.net/projects/glew/files/glew/%s/%s/download" % (self.version, zip_name), zip_name)
-        unzip(zip_name)
-        os.unlink(zip_name)
+        zip_name = "%s-%s" % (self.name, self.version) 
+        tools.download(\
+            "https://sourceforge.net/projects/glew/files/glew/%s/%s.tgz/download"\
+                       % (self.version, zip_name), zip_name + ".tgz")
+        unzip(zip_name + ".tgz")
+        os.unlink(zip_name + ".tgz")
+        os.rename(zip_name, self.source_subfolder)
 
     def build(self):
 
