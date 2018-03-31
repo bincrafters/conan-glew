@@ -22,22 +22,14 @@ class GlewConan(ConanFile):
         if os_info.is_linux:
             if os_info.with_apt:
                 installer = SystemPackageTool()
-                if self.version == "master":
-                    installer.install("build-essential")
-                    installer.install("libxmu-dev")
-                    installer.install("libxi-dev")
-                    installer.install("libgl-dev")
-                    installer.install("libosmesa-dev")
+                installer.install("libgl-dev")
                 if self.settings.arch == "x86" and tools.detected_architecture() == "x86_64":
                     installer.install("libglu1-mesa-dev:i386")
                 else:
                     installer.install("libglu1-mesa-dev")
             elif os_info.with_yum:
                 installer = SystemPackageTool()
-                if self.version == "master":
-                    installer.install("libXmu-devel")
-                    installer.install("libXi-devel")
-                    installer.install("libGL-devel")
+                installer.install("libGL-devel")
                 if self.settings.arch == "x86" and tools.detected_architecture() == "x86_64":
                     installer.install("mesa-libGLU-devel.i686")
                 else:
