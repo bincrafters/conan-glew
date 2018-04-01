@@ -30,6 +30,8 @@ class GlewConan(ConanFile):
             elif os_info.with_yum:
                 installer = SystemPackageTool()
                 if self.settings.arch == "x86" and tools.detected_architecture() == "x86_64":
+                    installer.install("glibmm24.i686")
+                    installer.install("glibc-devel.i686")
                     installer.install("libGLU-devel.i686")
                 else:
                     installer.install("libGLU-devel")
