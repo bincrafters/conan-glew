@@ -23,7 +23,7 @@ class GlewConan(ConanFile):
             if os_info.with_apt:
                 installer = SystemPackageTool()
                 if self.settings.arch == "x86" and tools.detected_architecture() == "x86_64":
-                    installer.install("g++-multilib")
+                    installer.install("gcc-multilib")
                     installer.install("libglu1-mesa-dev:i386")
                 else:
                     installer.install("libglu1-mesa-dev")
