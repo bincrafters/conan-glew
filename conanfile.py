@@ -1,8 +1,5 @@
 import os
-from conans import ConanFile, CMake
-from conans.tools import os_info, SystemPackageTool, replace_in_file
-from conans import tools, VisualStudioBuildEnvironment
-from conans.tools import build_sln_command, vcvars_command, unzip
+from conans import ConanFile, CMake, tools, MSBuild
 
 class GlewConan(ConanFile):
     name = "glew"
@@ -19,16 +16,16 @@ class GlewConan(ConanFile):
     source_subfolder = "source_subfolder"
         
     def system_requirements(self):
-        if os_info.is_linux:
-            if os_info.with_apt:
-                installer = SystemPackageTool()
+        if tools.os_info.is_linux:
+            if tools.os_info.with_apt:
+                installer = tools.SystemPackageTool()
                 if self.settings.arch == "x86" and tools.detected_architecture() == "x86_64":
                     installer.install("gcc-multilib")
                     installer.install("libglu1-mesa-dev:i386")
                 else:
                     installer.install("libglu1-mesa-dev")
-            elif os_info.with_yum:
-                installer = SystemPackageTool()
+            elif tools.os_info.with_yum:
+                installer = tools.SystemPackageTool()
                 if self.settings.arch == "x86" and tools.detected_architecture() == "x86_64":
                     installer.install("glibmm24.i686")
                     installer.install("glibc-devel.i686")
@@ -46,23 +43,27 @@ class GlewConan(ConanFile):
         tools.download(\
             "https://sourceforge.net/projects/glew/files/glew/%s/%s.tgz/download"\
                        % (self.version, zip_name), zip_name + ".tgz")
-        unzip(zip_name + ".tgz")
+        tools.unzip(zip_name + ".tgz")
         os.unlink(zip_name + ".tgz")
         os.rename(zip_name, self.source_subfolder)
 
     def build(self):
 
         if self.settings.compiler == "Visual Studio":
-            env = VisualStudioBuildEnvironment(self)
-            with tools.environment_append(env.vars):
-                version = min(12, int(self.settings.compiler.version.value))
-                version = 10 if version == 11 else version
-                cd_build = "cd %s\\%s\\build\\vc%s" % (self.build_folder, self.source_subfolder, version)
-                build_command = build_sln_command(self.settings, "glew.sln")
-                vcvars = vcvars_command(self.settings)
-                self.run("%s && %s && %s" % (vcvars, cd_build, build_command.replace("x86", "Win32")))
+#            env = VisualStudioBuildEnvironment(self)
+#            with tools.environment_append(env.vars):
+            version = min(12, int(self.settings.compiler.version.value))
+            version = 10 if version == 11 else version
+            path = "%s\\%s\\build\\vc%s" % (self.build_folder, self.source_subfolder, version)
+            with tools.chdir(path):
+                msbuild = MSBuild(self)
+                msbuild.build("glew.sln", platforms={"x86": "Win32"})
+#            build_command = tools.build_sln_command(self.settings, "glew.sln")
+#            vcvars = tools.vcvars_command(self.settings)
+#            self.run("%s && %s && %s" % (vcvars, cd_build, build_command.replace("x86", "Win32")))
+
         else:
-            replace_in_file("%s/build/cmake/CMakeLists.txt" % self.source_subfolder, "include(GNUInstallDirs)",
+            tools.replace_in_file("%s/build/cmake/CMakeLists.txt" % self.source_subfolder, "include(GNUInstallDirs)",
 """
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
