@@ -52,8 +52,10 @@ class GlewConan(ConanFile):
         if self.settings.compiler == "Visual Studio":
             version = min(12, int(self.settings.compiler.version.value))
             version = 10 if version == 11 else version
-            path = "%s\\%s\\build\\vc%s" % (self.build_folder, self.source_subfolder, version)
+            path = "%s\\%s\\build\\vc%s" % (self.build_folder, self.source_subfolder, version)            
             with tools.chdir(path):
+                tools.replace_in_file("glew_shared.vcxproj", "EnableFastChecks", "Default")
+                tools.replace_in_file("glew_static.vcxproj", "EnableFastChecks", "Default")
                 msbuild = MSBuild(self)
                 msbuild.build("glew.sln", platforms={"x86": "Win32"}, upgrade_project=int(self.settings.compiler.version.value)>12 )
         else:
