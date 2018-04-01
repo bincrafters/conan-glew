@@ -50,18 +50,12 @@ class GlewConan(ConanFile):
     def build(self):
 
         if self.settings.compiler == "Visual Studio":
-#            env = VisualStudioBuildEnvironment(self)
-#            with tools.environment_append(env.vars):
             version = min(12, int(self.settings.compiler.version.value))
             version = 10 if version == 11 else version
             path = "%s\\%s\\build\\vc%s" % (self.build_folder, self.source_subfolder, version)
             with tools.chdir(path):
                 msbuild = MSBuild(self)
-                msbuild.build("glew.sln", platforms={"x86": "Win32"})
-#            build_command = tools.build_sln_command(self.settings, "glew.sln")
-#            vcvars = tools.vcvars_command(self.settings)
-#            self.run("%s && %s && %s" % (vcvars, cd_build, build_command.replace("x86", "Win32")))
-
+                msbuild.build("glew.sln", platforms={"x86": "Win32"}, upgrade_project=int(self.settings.compiler.version.value)>12 )
         else:
             tools.replace_in_file("%s/build/cmake/CMakeLists.txt" % self.source_subfolder, "include(GNUInstallDirs)",
 """
