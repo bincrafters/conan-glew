@@ -14,7 +14,3 @@ file(GLOB SOURCE_FILES *.cpp)
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 target_link_libraries(${PROJECT_NAME} ${CONAN_LIBS})
-
-if(MSVC)
-  SET( CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -subsystem:console" )
-endif(MSVC)
