@@ -115,9 +115,6 @@ include(GNUInstallDirs)
                 if not self.options.shared:
                     self.cpp_info.libs[0] += "s"
                     self.cpp_info.libs.append("OpenGL32.lib")
-#                    if self.settings.compiler.runtime != "MT":
-#                        self.cpp_info.exelinkflags.append('-NODEFAULTLIB:LIBCMTD')
-#                        self.cpp_info.exelinkflags.append('-NODEFAULTLIB:LIBCMT')
             else:
                 self.cpp_info.libs.append("opengl32")
                 
