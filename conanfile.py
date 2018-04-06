@@ -1,5 +1,5 @@
 import os
-from conans import ConanFile, CMake, tools, MSBuild
+from conans import ConanFile, CMake, tools
 
 class GlewConan(ConanFile):
     name = "glew"
@@ -9,7 +9,7 @@ class GlewConan(ConanFile):
     homepage="http://github.com/nigels-com/glew"
     license="MIT"    
     exports_sources = ["FindGLEW.cmake"]
-    generators = "cmake", "txt"
+    generators = "cmake"
     settings = "os", "arch", "build_type", "compiler"
     options = {"shared": [True, False]}
     default_options = "shared=False"
@@ -48,26 +48,15 @@ class GlewConan(ConanFile):
         os.rename(zip_name, self.source_subfolder)
 
     def build(self):
-
-        if self.settings.compiler == "Visual Studio":
-            version = min(12, int(self.settings.compiler.version.value))
-            version = 10 if version == 11 else version
-            path = "%s\\%s\\build\\vc%s" % (self.build_folder, self.source_subfolder, version)            
-            with tools.chdir(path):
-                tools.replace_in_file("glew_shared.vcxproj", "EnableFastChecks", "Default")
-                tools.replace_in_file("glew_static.vcxproj", "EnableFastChecks", "Default")
-                msbuild = MSBuild(self)
-                msbuild.build("glew.sln", platforms={"x86": "Win32"}, upgrade_project=int(self.settings.compiler.version.value)>12 )
-        else:
-            tools.replace_in_file("%s/build/cmake/CMakeLists.txt" % self.source_subfolder, "include(GNUInstallDirs)",
+        tools.replace_in_file("%s/build/cmake/CMakeLists.txt" % self.source_subfolder, "include(GNUInstallDirs)",
 """
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
 include(GNUInstallDirs)
 """)
-            cmake = CMake(self)
-            cmake.configure(source_dir="%s/build/cmake" % self.source_subfolder, defs={"BUILD_UTILS": "OFF"})
-            cmake.build()
+        cmake = CMake(self)
+        cmake.configure(source_dir="%s/build/cmake" % self.source_subfolder, defs={"BUILD_UTILS": "OFF"})
+        cmake.build()
 
     def package(self):
         self.copy("FindGLEW.cmake", ".", ".", keep_path=False)
@@ -78,12 +67,17 @@ include(GNUInstallDirs)
             if self.settings.compiler == "Visual Studio":
                 self.copy(pattern="*.pdb", dst="bin", keep_path=False)
                 if self.options.shared:
-                    self.copy(pattern="*32.lib", dst="lib", keep_path=False)
-                    self.copy(pattern="*32d.lib", dst="lib", keep_path=False)
-                    self.copy(pattern="*.dll", dst="bin", keep_path=False)
+                    if self.settings.build_type == "Release":
+                        self.copy("glew32.lib", "lib", "lib", keep_path=False)
+                        self.copy("glew32.dll", "bin", "bin", keep_path=False)
+                    else:
+                        self.copy("glew32d.lib", "lib", "lib", keep_path=False)
+                        self.copy("glew32d.dll", "bin", "bin", keep_path=False)
                 else:
-                    self.copy(pattern="*32s.lib", dst="lib", keep_path=False)
-                    self.copy(pattern="*32sd.lib", dst="lib", keep_path=False)
+                    if self.settings.build_type == "Release":
+                        self.copy("libglew32.lib", "lib", "lib", keep_path=False)
+                    else:
+                        self.copy("libglew32d.lib", "lib", "lib", keep_path=False)
             else:
                 if self.options.shared:
                     self.copy(pattern="*32.dll.a", dst="lib", keep_path=False)
@@ -113,7 +107,7 @@ include(GNUInstallDirs)
 
             if self.settings.compiler == "Visual Studio":
                 if not self.options.shared:
-                    self.cpp_info.libs[0] += "s"
+                    self.cpp_info.libs[0] = "lib" + self.cpp_info.libs[0]
                     self.cpp_info.libs.append("OpenGL32.lib")
             else:
                 self.cpp_info.libs.append("opengl32")
