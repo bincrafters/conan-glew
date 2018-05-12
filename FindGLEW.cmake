@@ -1,18 +1,22 @@
-find_path(
-  GLEW_INCLUDE_DIR
-  NAMES
-  GL
-  PATHS
-  include)
+find_path(GLEW_INCLUDE_DIR NAMES GL/glew.h PATHS {CONAN_INCLUDE_DIRS_GLEW} NO_CMAKE_FIND_ROOT_PATH)
+find_library(GLEW_LIBRARY NAMES ${CONAN_LIBS_GLEW} PATHS ${CONAN_LIB_DIRS_GLEW} NO_CMAKE_FIND_ROOT_PATH)
 
-find_library(
-  GLEW_LIBRARY
-  NAMES
-  GLEW GLEWd glew32 glew32s glew32d glew32sd
-  PATHS
-  lib)
+message(STATUS "** GLEW ALREADY FOUND BY CONAN!")
+message(STATUS "** FOUND GLEW: ${GLEW_LIBRARY}")
+message(STATUS "** FOUND GLEW INCLUDE: ${GLEW_INCLUDE_DIR}")
 
-include(FindPackageHandleStandardArgs)
+if(MSVC)
+  set(GLEW_LIBRARY ${GLEW_LIBRARY} opengl32)
+endif()
+if(APPLE)
+  set(GLEW_LIBRARY ${GLEW_LIBRARY} -framework OpenGL)
+endif()
+if(UNIX AND NOT APPLE)
+  set(GLEW_LIBRARY ${GLEW_LIBRARY} GL)
+endif()
 
-find_package_handle_standard_args(GLEW REQUIRED_VARS GLEW_LIBRARY GLEW_INCLUDE_DIR)
+set(GLEW_FOUND TRUE)
+set(GLEW_INCLUDE_DIRS ${GLEW_INCLUDE_DIR})
+set(GLEW_LIBRARIES ${GLEW_LIBRARY})
 
+mark_as_advanced(GLEW_LIBRARY GLEW_INCLUDE_DIR)
