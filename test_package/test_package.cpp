@@ -1,6 +1,6 @@
 #include "GL/glew.h"
 
-int main (){
+int main () {
   glewGetString(GLEW_VERSION);
   return 0;
 }
