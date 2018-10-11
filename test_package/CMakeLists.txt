@@ -10,7 +10,7 @@ if(MSVC)
   string(REGEX REPLACE "/RTC(su|[1su])" "" CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
 endif(MSVC)
 
-file(GLOB SOURCE_FILES *.cpp)
+file(GLOB SOURCE_FILES *.c)
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 target_link_libraries(${PROJECT_NAME} ${CONAN_LIBS})
