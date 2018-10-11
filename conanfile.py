@@ -5,16 +5,18 @@ class GlewConan(ConanFile):
     name = "glew"
     version = "2.1.0"
     description = "The GLEW library"
-    url="http://github.com/bincrafters/conan-glew"
-    homepage="http://github.com/nigels-com/glew"
-    license="MIT"    
-    exports_sources = ["FindGLEW.cmake"]
+    url = "http://github.com/bincrafters/conan-glew"
+    homepage = "http://github.com/nigels-com/glew"
+    author = "Bincrafters <bincrafters@gmail.com>"
+    license = "MIT"
+    exports = ["LICENSE.md"]
+    exports_sources = ["CMakeLists.txt", "FindGLEW.cmake"]
     generators = "cmake"
     settings = "os", "arch", "build_type", "compiler"
     options = {"shared": [True, False]}
     default_options = "shared=False"
     source_subfolder = "source_subfolder"
-        
+
     def system_requirements(self):
         if tools.os_info.is_linux:
             if tools.os_info.with_apt:
@@ -39,29 +41,34 @@ class GlewConan(ConanFile):
         del self.settings.compiler.libcxx
 
     def source(self):
-        zip_name = "%s-%s" % (self.name, self.version) 
-        tools.download(\
-            "https://sourceforge.net/projects/glew/files/glew/%s/%s.tgz/download"\
-                       % (self.version, zip_name), zip_name + ".tgz")
-        tools.unzip(zip_name + ".tgz")
-        os.unlink(zip_name + ".tgz")
-        os.rename(zip_name, self.source_subfolder)
-
-    def build(self):
+        release_name = "%s-%s" % (self.name, self.version)
+        tools.get("{0}/releases/download/{1}/{1}.tgz".format(self.homepage, release_name), sha256="04de91e7e6763039bc11940095cd9c7f880baba82196a7765f727ac05a993c95")
+        os.rename(release_name, self.source_subfolder)
         tools.replace_in_file("%s/build/cmake/CMakeLists.txt" % self.source_subfolder, "include(GNUInstallDirs)",
 """
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
 include(GNUInstallDirs)
 """)
+
+    def configure_cmake(self):
         cmake = CMake(self)
-        cmake.configure(source_dir="%s/build/cmake" % self.source_subfolder, defs={"BUILD_UTILS": "OFF"})
+        cmake.definitions["BUILD_UTILS"] = "OFF"
+        cmake.configure(source_folder="{}/build/cmake".format(self.source_subfolder))
+        return cmake
+
+    def build(self):
+        cmake = self.configure_cmake()
         cmake.build()
 
     def package(self):
+        cmake = self.configure_cmake()
+        cmake.install()
+
         self.copy("FindGLEW.cmake", ".", ".", keep_path=False)
         self.copy("include/*", ".", "%s" % self.source_subfolder, keep_path=True)
         self.copy("%s/license*" % self.source_subfolder, dst="licenses",  ignore_case=True, keep_path=False)
+        self.copy(pattern="LICENSE", dst="licenses", src=self.source_subfolder)
 
         if self.settings.os == "Windows":
             if self.settings.compiler == "Visual Studio":
@@ -111,7 +118,7 @@ include(GNUInstallDirs)
                     self.cpp_info.libs.append("OpenGL32.lib")
             else:
                 self.cpp_info.libs.append("opengl32")
-                
+
         else:
             self.cpp_info.libs = ['GLEW']
             if self.settings.os == "Macos":
