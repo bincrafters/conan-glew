@@ -14,8 +14,8 @@ class GlewConan(ConanFile):
     generators = "cmake"
     settings = "os", "arch", "build_type", "compiler"
     options = {"shared": [True, False]}
-    default_options = "shared=False"
-    source_subfolder = "source_subfolder"
+    default_options = {"shared": False}
+    _source_subfolder = "_source_subfolder"
 
     def system_requirements(self):
         if tools.os_info.is_linux:
@@ -43,32 +43,32 @@ class GlewConan(ConanFile):
     def source(self):
         release_name = "%s-%s" % (self.name, self.version)
         tools.get("{0}/releases/download/{1}/{1}.tgz".format(self.homepage, release_name), sha256="04de91e7e6763039bc11940095cd9c7f880baba82196a7765f727ac05a993c95")
-        os.rename(release_name, self.source_subfolder)
-        tools.replace_in_file("%s/build/cmake/CMakeLists.txt" % self.source_subfolder, "include(GNUInstallDirs)",
+        os.rename(release_name, self._source_subfolder)
+        tools.replace_in_file("%s/build/cmake/CMakeLists.txt" % self._source_subfolder, "include(GNUInstallDirs)",
 """
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
 include(GNUInstallDirs)
 """)
 
-    def configure_cmake(self):
+    def _configure_cmake(self):
         cmake = CMake(self)
         cmake.definitions["BUILD_UTILS"] = "OFF"
-        cmake.configure(source_folder="{}/build/cmake".format(self.source_subfolder))
+        cmake.configure(source_folder="{}/build/cmake".format(self._source_subfolder))
         return cmake
 
     def build(self):
-        cmake = self.configure_cmake()
+        cmake = self._configure_cmake()
         cmake.build()
 
     def package(self):
-        cmake = self.configure_cmake()
+        cmake = self._configure_cmake()
         cmake.install()
 
         self.copy("FindGLEW.cmake", ".", ".", keep_path=False)
-        self.copy("include/*", ".", "%s" % self.source_subfolder, keep_path=True)
-        self.copy("%s/license*" % self.source_subfolder, dst="licenses",  ignore_case=True, keep_path=False)
-        self.copy(pattern="LICENSE", dst="licenses", src=self.source_subfolder)
+        self.copy("include/*", ".", "%s" % self._source_subfolder, keep_path=True)
+        self.copy("%s/license*" % self._source_subfolder, dst="licenses",  ignore_case=True, keep_path=False)
+        self.copy(pattern="LICENSE", dst="licenses", src=self._source_subfolder)
 
         if self.settings.os == "Windows":
             if self.settings.compiler == "Visual Studio":
