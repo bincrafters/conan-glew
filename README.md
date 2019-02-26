@@ -60,4 +60,4 @@ The following command both runs all the steps of the conan file, and publishes t
 NOTE: The conan recipe license applies only to the files of this recipe, which can be used to build and package glew.
 It does *not* in any way apply or is related to the actual software being packaged.
 
-[MIT](https://github.com/bincrafters/conan-glew.git/blob/testing/2.1.0/LICENSE)
+[MIT](https://github.com/bincrafters/conan-glew.git/blob/stable/2.1.0/LICENSE)
