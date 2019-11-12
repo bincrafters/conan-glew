@@ -7,7 +7,6 @@ class GlewConan(ConanFile):
     description = "The GLEW library"
     url = "http://github.com/bincrafters/conan-glew"
     homepage = "http://github.com/nigels-com/glew"
-    author = "Bincrafters <bincrafters@gmail.com>"
     license = "MIT"
     exports = ["LICENSE.md"]
     exports_sources = ["CMakeLists.txt", "FindGLEW.cmake"]
