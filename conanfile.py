@@ -16,25 +16,9 @@ class GlewConan(ConanFile):
     default_options = {"shared": False}
     _source_subfolder = "_source_subfolder"
 
-    def system_requirements(self):
-        if tools.os_info.is_linux:
-            if tools.os_info.with_apt:
-                installer = tools.SystemPackageTool()
-                if self.settings.arch == "x86" and tools.detected_architecture() == "x86_64":
-                    installer.install("gcc-multilib")
-                    installer.install("libglu1-mesa-dev:i386")
-                else:
-                    installer.install("libglu1-mesa-dev")
-            elif tools.os_info.with_yum:
-                installer = tools.SystemPackageTool()
-                if self.settings.arch == "x86" and tools.detected_architecture() == "x86_64":
-                    installer.install("glibmm24.i686")
-                    installer.install("glibc-devel.i686")
-                    installer.install("libGLU-devel.i686")
-                else:
-                    installer.install("libGLU-devel")
-            else:
-                self.output.warn("Could not determine Linux package manager, skipping system requirements installation.")
+    def requirements(self):
+        if self.settings.os == 'Linux':
+            self.requires("mesa-glu/9.0.1@bincrafters/stable")
 
     def configure(self):
         del self.settings.compiler.libcxx
@@ -123,8 +107,6 @@ include(GNUInstallDirs)
             self.cpp_info.libs = ['GLEW']
             if self.settings.os == "Macos":
                 self.cpp_info.exelinkflags.append("-framework OpenGL")
-            elif not self.options.shared:
-                self.cpp_info.libs.append("GL")
 
         if self.settings.build_type == "Debug":
             self.cpp_info.libs[0] += "d"
