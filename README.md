@@ -1,5 +1,5 @@
 [![Download](https://api.bintray.com/packages/bincrafters/public-conan/glew%3Abincrafters/images/download.svg) ](https://bintray.com/bincrafters/public-conan/glew%3Abincrafters/_latestVersion)
-[![Build Status](https://travis-ci.org/bincrafters/conan-glew.svg?branch=stable%2F2.1.0)](https://travis-ci.org/bincrafters/conan-glew)
+[![Build Status](https://travis-ci.com/bincrafters/conan-glew.svg?branch=stable%2F2.1.0)](https://travis-ci.com/bincrafters/conan-glew)
 [![Build status](https://ci.appveyor.com/api/projects/status/github/bincrafters/conan-glew?branch=stable%2F2.1.0&svg=true)](https://ci.appveyor.com/project/bincrafters/conan-glew)
 
 [Conan.io](https://conan.io) package recipe for [*glew*](http://github.com/nigels-com/glew).

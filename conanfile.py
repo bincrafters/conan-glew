@@ -40,6 +40,7 @@ class GlewConan(ConanFile):
 
     def configure(self):
         del self.settings.compiler.libcxx
+        del self.settings.compiler.cppstd
 
     def source(self):
         release_name = "%s-%s" % (self.name, self.version)
