@@ -106,7 +106,7 @@ include(GNUInstallDirs)
         else:
             self.cpp_info.libs = ['GLEW']
             if self.settings.os == "Macos":
-                self.cpp_info.exelinkflags.append("-framework OpenGL")
+                self.cpp_info.frameworks = ["OpenGL"]
 
         if self.settings.build_type == "Debug":
             self.cpp_info.libs[0] += "d"

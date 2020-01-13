@@ -1,6 +1,7 @@
+#include <stdio.h>
 #include "GL/glew.h"
 
 int main () {
-  glewGetString(GLEW_VERSION);
+  printf("Status: Using GLEW %s\n", glewGetString(GLEW_VERSION));
   return 0;
 }
