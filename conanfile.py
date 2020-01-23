@@ -9,7 +9,7 @@ class GlewConan(ConanFile):
     homepage = "http://github.com/nigels-com/glew"
     license = "MIT"
     exports = ["LICENSE.md"]
-    exports_sources = ["CMakeLists.txt", "FindGLEW.cmake"]
+    exports_sources = ["CMakeLists.txt", "FindGLEW.cmake", "vs16-release-fix.patch"]
     generators = "cmake"
     settings = "os", "arch", "build_type", "compiler"
     options = {"shared": [True, False]}
@@ -28,6 +28,8 @@ class GlewConan(ConanFile):
         release_name = "%s-%s" % (self.name, self.version)
         tools.get("{0}/releases/download/{1}/{1}.tgz".format(self.homepage, release_name), sha256="04de91e7e6763039bc11940095cd9c7f880baba82196a7765f727ac05a993c95")
         os.rename(release_name, self._source_subfolder)
+        # Fix build for Visual Studio 16 Release (issue #1087)
+        tools.patch(base_path=self._source_subfolder, patch_file="vs16-release-fix.patch")
         tools.replace_in_file("%s/build/cmake/CMakeLists.txt" % self._source_subfolder, "include(GNUInstallDirs)",
 """
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
