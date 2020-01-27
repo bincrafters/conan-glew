@@ -7,6 +7,8 @@ class GlewConan(ConanFile):
     description = "The GLEW library"
     url = "http://github.com/bincrafters/conan-glew"
     homepage = "http://github.com/nigels-com/glew"
+    author = "Bincrafters <bincrafters@gmail.com>"
+    topics = "conan", "glew", "opengl", "wrangler", "loader", "binding",
     license = "MIT"
     exports = ["LICENSE.md"]
     exports_sources = ["CMakeLists.txt", "FindGLEW.cmake", "vs16-release-fix.patch"]
@@ -40,7 +42,8 @@ include(GNUInstallDirs)
     def _configure_cmake(self):
         cmake = CMake(self)
         cmake.definitions["BUILD_UTILS"] = "OFF"
-        cmake.configure(source_folder="{}/build/cmake".format(self._source_subfolder))
+        cmake.definitions["CONAN_GLEW_DEFINITIONS"] = ";".join(self._glew_defines)
+        cmake.configure()
         return cmake
 
     def build(self):
@@ -91,12 +94,17 @@ include(GNUInstallDirs)
             else:
                 self.copy(pattern="*.a", dst="lib", keep_path=False)
 
+    @property
+    def _glew_defines(self):
+        defines = []
+        if self.settings.os == "Windows" and not self.options.shared:
+            defines.append("GLEW_STATIC")
+        return defines
+
     def package_info(self):
+        self.cpp_info.defines = self._glew_defines
         if self.settings.os == "Windows":
             self.cpp_info.libs = ['glew32']
-
-            if not self.options.shared:
-                self.cpp_info.defines.append("GLEW_STATIC")
 
             if self.settings.compiler == "Visual Studio":
                 if not self.options.shared:
