@@ -9,7 +9,6 @@ class GlewConan(ConanFile):
     homepage = "http://github.com/nigels-com/glew"
     topics = ("conan", "glew", "opengl", "wrangler", "loader", "binding")
     license = "MIT"
-    exports = ["LICENSE.md"]
     exports_sources = ["CMakeLists.txt", "FindGLEW.cmake.in", "vs16-release-fix.patch"]
     generators = "cmake"
     settings = "os", "arch", "build_type", "compiler"
