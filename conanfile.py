@@ -17,8 +17,8 @@ class GlewConan(ConanFile):
     _source_subfolder = "_source_subfolder"
 
     def requirements(self):
-        if self.settings.os == 'Linux':
-            self.requires("mesa-glu/9.0.1@bincrafters/stable")
+        self.requires("opengl/system")
+        self.requires("glu/system")
 
     def configure(self):
         del self.settings.compiler.libcxx
